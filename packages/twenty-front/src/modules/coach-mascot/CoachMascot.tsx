@@ -26,10 +26,13 @@ const StyledMascotButton = styled(motion.button)<{ offsetX: number; offsetY: num
   border: 1px solid ${themeCssVariables.border.color.medium};
   border-radius: ${themeCssVariables.border.radius.md};
   bottom: ${themeCssVariables.spacing[3]};
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+  box-shadow:
+    0 6px 20px rgba(0, 0, 0, 0.22),
+    0 2px 6px rgba(0, 0, 0, 0.12);
   color: ${themeCssVariables.font.color.tertiary};
   cursor: grab;
   display: flex;
+  flex: none;
   height: 48px;
   justify-content: center;
   padding: 0;
@@ -42,11 +45,13 @@ const StyledMascotButton = styled(motion.button)<{ offsetX: number; offsetY: num
     border-color 0.15s ease;
   user-select: none;
   width: 48px;
-  z-index: 50;
+  z-index: ${themeCssVariables.lastLayerZIndex};
 
   &:hover {
     border-color: ${themeCssVariables.border.color.strong};
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.22);
+    box-shadow:
+      0 10px 28px rgba(0, 0, 0, 0.28),
+      0 3px 8px rgba(0, 0, 0, 0.14);
     color: ${themeCssVariables.font.color.secondary};
   }
 

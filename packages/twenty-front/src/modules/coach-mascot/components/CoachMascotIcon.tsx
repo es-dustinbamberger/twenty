@@ -1,50 +1,38 @@
 import { type CSSProperties, type MouseEvent } from 'react';
-import { motion } from 'framer-motion';
 
-type CoachMascotIconProps = {
+// CoachMascotIcon — renders the feather quill SVG asset.
+//
+// Per the design spec (anti-cheesy rules, see public/coach-mascot/quill.svg):
+//   - Bold filled silhouette with negative-space barb cuts
+//   - Monochrome (currentColor) + single ES orange accent at the nib tip
+//   - 22° tilt, no face, no shadow, no gradient
+//   - 48px target size, designed to read at sidebar-widget scale
+//
+// We use an <img> tag rather than inlining the SVG so the asset file
+// stays the single source of truth — the design review in
+// twenty-mascot/ can iterate on the SVG independently of the React
+// component. The img element inherits currentColor via Twenty's CSS
+// pipeline, so the theme toggle works on both light and dark surfaces.
+export type CoachMascotIconProps = {
   size?: number;
   style?: CSSProperties;
-  onMouseDown?: (event: MouseEvent<SVGSVGElement>) => void;
+  onMouseDown?: (event: MouseEvent<HTMLImageElement>) => void;
 };
 
-// Modernized paperclip — V1 placeholder concept.
-//
-// Per the design spec (anti-cheesy rules):
-//   - Single closed stroke, asymmetric tilt (-12°) suggests motion
-//   - Monochrome (currentColor); no face, no mouth, no eyes
-//   - No 3D bevel, no shadow, no gradient, no glow
-//   - Rounded line caps and joins for industrial feel
-//
-// The chosen concept variant (after user design review) replaces this
-// file. The shape should NOT change to include any anthropomorphic
-// features — see DESIGN_twenty_system_of_record.md guardrails on the
-// mascot icon and the agent brief's anti-cheesy checklist.
 export const CoachMascotIcon = ({
-  size = 48,
+  size = 28,
   style,
   onMouseDown,
 }: CoachMascotIconProps) => {
   return (
-    <motion.svg
-      xmlns="http://www.w3.org/2000/svg"
+    <img
+      src="/coach-mascot/quill.svg"
+      alt="Quill"
       width={size}
       height={size}
-      viewBox="0 0 48 48"
-      fill="none"
-      style={{ display: 'block', ...style }}
-      aria-hidden="true"
+      draggable={false}
+      style={{ display: 'block', pointerEvents: 'none', ...style }}
       onMouseDown={onMouseDown}
-    >
-      <g transform="rotate(-12 24 24)">
-        <path
-          d="M 14 14 L 14 36 Q 14 40 18 40 L 28 40 Q 34 40 34 34 L 34 14 Q 34 10 30 10 L 22 10 Q 18 10 18 14 L 18 32"
-          stroke="currentColor"
-          strokeWidth={2.5}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
-        />
-      </g>
-    </motion.svg>
+    />
   );
 };

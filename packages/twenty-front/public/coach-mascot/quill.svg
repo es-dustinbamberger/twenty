@@ -1,72 +1,128 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Quill mascot — feather quill, V1 working baseline.
+  Quill mascot — flat vintage design (V1 final, transparent).
 
-  Hand-crafted to apply the spec correctly while keeping the strongest
-  moves from the nano banana iterations (bold filled silhouette, negative-
-  space barb cuts that follow the feather's contour).
+  Coordinate system: 512×512 viewBox (standard icon size).
 
-  Anti-cheesy compliance:
-    - No face, no eyes, no mouth, no anthropomorphic features
-    - No 3D bevel, no drop shadow, no gradient, no glow
-    - No texture, no grain, no paper finish
-    - No decorative speckles, no stars, no frame
-    - Monochrome fill (white/cream) + single EquipmentShare orange
-      accent (#FD6600) at the nib tip
-    - Filled silhouette rather than stroked outline
-    - Tilt: 22 degrees (anchored, not falling)
+  No background — the design sits directly on the button's
+  background, so the icon inherits the Twenty theme color.
 
-  Negative-space barb technique:
-    The two inner cuts use fill-rule="evenodd" so the page background
-    shows through them. This preserves the bold-feather-with-visible-
-    barbs reading without depending on a fixed background color — the
-    mascot works on light and dark Twenty themes, on any page surface.
+  Elements (back to front):
+    1. Cream feather body (teardrop, diagonal bottom-left → top-right)
+       with black shaft + 4 vein cutouts on each side (even-odd fill)
+    2. Sharp cream arrowhead at the bottom-left tip
+    3. Concentric target/bullseye at the shaft base (red-white-black)
+    4. Five cream specks scattered around the feather
 
-  48px readability:
-    - Bold filled silhouette with clear nib-vs-feather distinction
-    - Two barb cuts sized to read at 48px without becoming noise
-    - Orange dot at the writing point is the only chromatic anchor
+  Colors:
+    - Cream:          #F2EFE6 (feather, arrowhead, specks, target ring)
+    - Red accent:     #C93C24
+    - Black:          #1A1A1A (shaft, target center)
 -->
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
-  <g transform="rotate(-22 24 24)">
-    <!--
-      Feather with negative-space barb cuts.
-      Outer subpath: full feather silhouette.
-      Two inner subpaths: barb cuts (even-odd rule makes them unfilled).
-    -->
-    <path
-      fill-rule="evenodd"
-      fill="currentColor"
-      d="
-        M 22 38
-        L 22 36
-        L 36 22
-        Q 40 18 38 14
-        Q 34 8 28 10
-        L 22 16
-        Z
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
 
-        M 26 30
-        L 32 24
-        L 33 26
-        L 27 32
-        Z
+  <!-- 1. Forest green rounded square background -->
+  <rect width="512" height="512" rx="100" fill="#2D5A37"/>
 
-        M 28 22
-        L 34 16
-        L 35 18
-        L 29 24
-        Z
-      "
-    />
+  <!-- 2. Cream feather body with black shaft + veins as negative space -->
+  <path
+    fill="#F2EFE6"
+    fill-rule="evenodd"
+    d="
+      M 386 134
+      C 380 105 348  88 312  92
+      C 270  98 235 130 215 165
+      C 195 200 185 240 182 280
+      C 180 320 184 350 196 372
+      L 218 358
+      L 196 372
+      L 218 386
+      L 196 372
+      C 208 388 220 392 230 388
+      C 240 384 244 372 240 360
+      C 232 332 232 300 240 268
+      C 248 234 264 202 286 174
+      C 308 146 334 130 360 130
+      C 372 130 380 132 386 134
+      Z
 
-    <!-- Nib at lower terminus (angular, simple, no decorative ring) -->
-    <path
-      fill="currentColor"
-      d="M 14 30 L 22 38 L 22 32 Z"
-    />
+      M 380 150
+      L 350 195
+      L 345 192
+      L 376 148
+      Z
 
-    <!-- EquipmentShare orange accent at the nib tip -->
-    <circle cx="22" cy="38" r="2" fill="#FD6600" />
-  </g>
+      M 350 200
+      L 314 252
+      L 309 249
+      L 346 198
+      Z
+
+      M 318 254
+      L 286 308
+      L 281 305
+      L 314 252
+      Z
+
+      M 286 312
+      L 262 358
+      L 257 355
+      L 282 310
+      Z
+
+      M 235 145
+      L 210 180
+      L 215 184
+      L 240 148
+      Z
+
+      M 218 192
+      L 198 230
+      L 203 234
+      L 224 196
+      Z
+
+      M 210 244
+      L 198 280
+      L 203 282
+      L 216 246
+      Z
+
+      M 208 296
+      L 206 326
+      L 211 326
+      L 214 298
+      Z
+    "
+  />
+
+  <!-- Black shaft (rendered as a line for clean edges) -->
+  <line
+    x1="172" y1="376" x2="386" y2="134"
+    stroke="#1A1A1A" stroke-width="5" stroke-linecap="round"
+  />
+
+  <!-- Sharp cream arrowhead at the tip (bottom-left) -->
+  <path
+    fill="#F2EFE6"
+    d="
+      M 172 376
+      L 218 360
+      L 200 392
+      Z
+    "
+  />
+
+  <!-- Concentric target/bullseye at (192, 344) -->
+  <circle cx="192" cy="344" r="40" fill="#C93C24"/>
+  <circle cx="192" cy="344" r="30" fill="#F2EFE6"/>
+  <circle cx="192" cy="344" r="10" fill="#1A1A1A"/>
+
+  <!-- Five cream specks scattered around the feather -->
+  <circle cx="226" cy="156" r="6" fill="#F2EFE6"/>
+  <circle cx="176" cy="230" r="6" fill="#F2EFE6"/>
+  <circle cx="316" cy="390" r="6" fill="#F2EFE6"/>
+  <circle cx="398" cy="348" r="6" fill="#F2EFE6"/>
+  <circle cx="436" cy="286" r="6" fill="#F2EFE6"/>
+
 </svg>
