@@ -1,0 +1,1 @@
+export { CoachMascot } from './CoachMascot';

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Quill mascot — feather quill, V1 working baseline.
+
+  Hand-crafted to apply the spec correctly while keeping the strongest
+  moves from the nano banana iterations (bold filled silhouette, negative-
+  space barb cuts that follow the feather's contour).
+
+  Anti-cheesy compliance:
+    - No face, no eyes, no mouth, no anthropomorphic features
+    - No 3D bevel, no drop shadow, no gradient, no glow
+    - No texture, no grain, no paper finish
+    - No decorative speckles, no stars, no frame
+    - Monochrome fill (white/cream) + single EquipmentShare orange
+      accent (#FD6600) at the nib tip
+    - Filled silhouette rather than stroked outline
+    - Tilt: 22 degrees (anchored, not falling)
+
+  Negative-space barb technique:
+    The two inner cuts use fill-rule="evenodd" so the page background
+    shows through them. This preserves the bold-feather-with-visible-
+    barbs reading without depending on a fixed background color — the
+    mascot works on light and dark Twenty themes, on any page surface.
+
+  48px readability:
+    - Bold filled silhouette with clear nib-vs-feather distinction
+    - Two barb cuts sized to read at 48px without becoming noise
+    - Orange dot at the writing point is the only chromatic anchor
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
+  <g transform="rotate(-22 24 24)">
+    <!--
+      Feather with negative-space barb cuts.
+      Outer subpath: full feather silhouette.
+      Two inner subpaths: barb cuts (even-odd rule makes them unfilled).
+    -->
+    <path
+      fill-rule="evenodd"
+      fill="currentColor"
+      d="
+        M 22 38
+        L 22 36
+        L 36 22
+        Q 40 18 38 14
+        Q 34 8 28 10
+        L 22 16
+        Z
+
+        M 26 30
+        L 32 24
+        L 33 26
+        L 27 32
+        Z
+
+        M 28 22
+        L 34 16
+        L 35 18
+        L 29 24
+        Z
+      "
+    />
+
+    <!-- Nib at lower terminus (angular, simple, no decorative ring) -->
+    <path
+      fill="currentColor"
+      d="M 14 30 L 22 38 L 22 32 Z"
+    />
+
+    <!-- EquipmentShare orange accent at the nib tip -->
+    <circle cx="22" cy="38" r="2" fill="#FD6600" />
+  </g>
+</svg>

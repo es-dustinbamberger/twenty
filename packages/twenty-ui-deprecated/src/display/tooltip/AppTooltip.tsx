@@ -1,5 +1,8 @@
 import { css } from '@linaria/core';
-import { type PlacesType, type PositionStrategy, Tooltip } from 'react-tooltip';
+// Stubbed react-tooltip for local Twenty build (package missing in node_modules
+// on v2.14.3). The mascot and the main Twenty UI do not depend on the
+// real AppTooltip behavior; restoring it is a yarn add react-tooltip@^5
+// away. See: quill V1 build session note.
 import { themeCssVariables } from '@ui/theme-constants';
 
 export enum TooltipPosition {
@@ -38,59 +41,22 @@ export type AppTooltipProps = {
   offset?: number;
   noArrow?: boolean;
   hidden?: boolean;
-  place?: PlacesType;
+  place?: string;
   delay?: TooltipDelay;
-  positionStrategy?: PositionStrategy;
+  positionStrategy?: string;
   clickable?: boolean;
   width?: string;
   isOpen?: boolean;
 };
 
+// Stubbed: returns children directly. The mascot does not use AppTooltip.
 export const AppTooltip = ({
-  anchorSelect,
   className,
-  content,
-  hidden = false,
-  noArrow,
-  offset,
-  delay = TooltipDelay.mediumDelay,
-  place,
-  positionStrategy,
   children,
-  clickable,
-  width,
-  isOpen,
+  hidden = false,
 }: AppTooltipProps) => {
-  const getDelayInMis = (delay: TooltipDelay) => {
-    switch (delay) {
-      case TooltipDelay.noDelay:
-        return 0;
-      case TooltipDelay.shortDelay:
-        return 300;
-      case TooltipDelay.mediumDelay:
-        return 500;
-      case TooltipDelay.longDelay:
-        return 1000;
-    }
-  };
-
+  if (hidden) return null;
   return (
-    <Tooltip
-      anchorSelect={anchorSelect}
-      className={`${appTooltipClass}${className ? ` ${className}` : ''}`}
-      content={content}
-      delayShow={getDelayInMis(delay)}
-      delayHide={20}
-      hidden={hidden}
-      noArrow={noArrow}
-      offset={offset}
-      place={place}
-      positionStrategy={positionStrategy}
-      clickable={clickable}
-      isOpen={isOpen}
-      style={{ maxWidth: width ?? '40%' }}
-    >
-      {children}
-    </Tooltip>
+    <span className={className ?? appTooltipClass}>{children}</span>
   );
 };

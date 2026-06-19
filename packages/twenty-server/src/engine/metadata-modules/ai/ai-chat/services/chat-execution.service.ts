@@ -49,6 +49,7 @@ import {
 import { AI_CHAT_TOOL_NAMES_TO_PRELOAD } from 'src/engine/metadata-modules/ai/ai-chat/constants/ai-chat-tool-names-to-preload.const';
 import { MessagePruningService } from 'src/engine/metadata-modules/ai/ai-chat/services/message-pruning.service';
 import { SystemPromptBuilderService } from 'src/engine/metadata-modules/ai/ai-chat/services/system-prompt-builder.service';
+import { AgentService } from 'src/engine/metadata-modules/ai/ai-agent/agent.service';
 import {
   extractCodeInterpreterFiles,
   type ExtractedFile,
@@ -74,6 +75,7 @@ export type ChatExecutionOptions = {
   onCompaction?: () => void;
   modelId?: string;
   abortSignal?: AbortSignal;
+  agentId?: string;
   conversationSizeTokens: number;
 };
 
@@ -97,6 +99,7 @@ export class ChatExecutionService {
     private readonly codeInterpreterService: CodeInterpreterService,
     private readonly systemPromptBuilder: SystemPromptBuilderService,
     private readonly exceptionHandlerService: ExceptionHandlerService,
+    private readonly agentService: AgentService,
     private readonly nativeToolBinder: NativeToolBinderService,
     private readonly messagePruningService: MessagePruningService,
     private readonly metricsService: MetricsService,
@@ -111,6 +114,7 @@ export class ChatExecutionService {
     onCompaction,
     modelId,
     abortSignal,
+    agentId,
     conversationSizeTokens,
   }: ChatExecutionOptions): Promise<ChatExecutionResult> {
     const { actorContext, roleId, userId, userContext } =
@@ -149,6 +153,21 @@ export class ChatExecutionService {
     );
 
     const resolvedModelId = modelId ?? workspace.smartModel;
+    let agentPrompt: string | undefined;
+    if (agentId) {
+      const agent = await this.agentService.findOneAgentById({
+        id: agentId,
+        workspaceId: workspace.id,
+      });
+      if (agent.prompt) {
+        agentPrompt = agent.prompt;
+      }
+    }
+
+    const combinedWorkspaceInstructions = [agentPrompt, workspace.aiAdditionalInstructions]
+      .filter((s): s is string => Boolean(s))
+      .join('\n\n') || undefined;
+
 
     this.aiModelRegistryService.validateModelAvailability(
       resolvedModelId,
@@ -249,7 +268,7 @@ export class ChatExecutionService {
       skillCatalog,
       preloadedToolNames,
       storedFiles,
-      workspace.aiAdditionalInstructions ?? undefined,
+      combinedWorkspaceInstructions,
       userContext,
     );
 

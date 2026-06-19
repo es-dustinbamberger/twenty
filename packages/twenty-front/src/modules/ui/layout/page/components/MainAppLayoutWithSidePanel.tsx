@@ -1,4 +1,5 @@
 import { CommandMenuForMobile } from '@/command-menu/components/CommandMenuForMobile';
+import { CoachMascot } from '@/coach-mascot/CoachMascot';
 import { useCommandMenuHotKeys } from '@/command-menu/hooks/useCommandMenuHotKeys';
 import { SidePanelForDesktop } from '@/side-panel/components/SidePanelForDesktop';
 import { useIsMobile } from '@/ui/utilities/responsive/hooks/useIsMobile';
@@ -88,6 +89,11 @@ export const MainAppLayoutWithSidePanel = () => {
         <MainAppLayoutOutlet />
       </StyledContent>
       {isMobile ? <CommandMenuForMobile /> : <SidePanelForDesktop />}
+      {/* Quill mascot — desktop-only launcher for the Ask AI side panel.
+          Phase 1 per DESIGN_twenty_system_of_record.md:75. Mobile out of
+          scope for V1; the existing Ask AI entry point on mobile remains
+          untouched. */}
+      {!isMobile && <CoachMascot />}
     </StyledRow>
   );
 };
