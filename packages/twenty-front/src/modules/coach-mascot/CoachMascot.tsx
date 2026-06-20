@@ -1,14 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
-import { styled } from '@linaria/react';
 
 import { currentWorkspaceMemberState } from '@/auth/states/currentWorkspaceMemberState';
 import { isSidePanelOpenedState } from '@/side-panel/states/isSidePanelOpenedState';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { useSetAtomState } from '@/ui/utilities/state/jotai/hooks/useSetAtomState';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
 
-import { CoachMascotIcon } from './components/CoachMascotIcon';
 import { useCoachMascotDrag } from './hooks/useCoachMascotDrag';
 import { useCoachMascotOpenChat } from './hooks/useCoachMascotOpenChat';
 import {
@@ -20,77 +16,46 @@ import {
 
 const EQUIPMENTSHARE_ORANGE = '#FD6600';
 
-const StyledMascotButton = styled(motion.button)<{ offsetX: number; offsetY: number }>`
-  align-items: center;
-  background: ${themeCssVariables.background.primary};
-  border: 1px solid ${themeCssVariables.border.color.medium};
-  border-radius: ${themeCssVariables.border.radius.md};
-  bottom: ${themeCssVariables.spacing[3]};
-  box-shadow:
-    0 6px 20px rgba(0, 0, 0, 0.22),
-    0 2px 6px rgba(0, 0, 0, 0.12);
-  color: ${themeCssVariables.font.color.tertiary};
-  cursor: grab;
-  display: flex;
-  flex: none;
-  height: 48px;
-  justify-content: center;
-  padding: 0;
-  position: fixed;
-  right: ${themeCssVariables.spacing[3]};
-  transform: translate(${({ offsetX }) => offsetX}px, ${({ offsetY }) => offsetY}px);
-  transition:
-    color 0.15s ease,
-    box-shadow 0.15s ease,
-    border-color 0.15s ease;
-  user-select: none;
-  width: 48px;
-  z-index: ${themeCssVariables.lastLayerZIndex};
+// The mascot is rendered as a single button. We use inline style
+// (not styled-components) for position to avoid any parent transform/
+// filter creating a containing block for position:fixed. The
+// button itself is borderless/transparent so only the feather icon
+// is visible — no gray rectangle around it.
+const buttonStyle = (offsetX: number, offsetY: number): React.CSSProperties => ({
+  position: 'fixed',
+  bottom: 8,
+  right: 8,
+  width: 64,
+  height: 64,
+  transform: `translate(${offsetX}px, ${offsetY}px)`,
+  background: 'transparent',
+  border: 'none',
+  padding: 0,
+  cursor: 'grab',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  zIndex: 2147483647,
+  userSelect: 'none',
+  filter: 'drop-shadow(0 4px 12px rgba(0, 0, 0, 0.25))',
+  transition: 'filter 0.15s ease',
+});
 
-  &:hover {
-    border-color: ${themeCssVariables.border.color.strong};
-    box-shadow:
-      0 10px 28px rgba(0, 0, 0, 0.28),
-      0 3px 8px rgba(0, 0, 0, 0.14);
-    color: ${themeCssVariables.font.color.secondary};
-  }
+const buttonStyleOpen = (offsetX: number, offsetY: number): React.CSSProperties => ({
+  ...buttonStyle(offsetX, offsetY),
+  filter: 'drop-shadow(0 0 0 #FD6600) drop-shadow(0 4px 12px rgba(253, 102, 0, 0.4))',
+});
 
-  &:focus-visible {
-    border-color: ${EQUIPMENTSHARE_ORANGE};
-    outline: none;
-  }
+const ICON_SIZE = 64;
 
-  &:active {
-    cursor: grabbing;
-  }
-`;
-
-const StyledMascotButtonOpen = styled(StyledMascotButton)`
-  border-color: ${EQUIPMENTSHARE_ORANGE};
-  color: ${EQUIPMENTSHARE_ORANGE};
-`;
-
-// CoachMascot — the floating Quill launcher.
-//
-// Phase 1 states only: Idle, Hover (via :hover CSS), Dragging, ChatOpen.
-// Phase 2+ adds: Observing, Nudge, Alert (see anti-cheesy escalation
-// ladder in DESIGN_twenty_system_of_record.md:81).
-//
-// The mascot is fixed-position, default-docked to the bottom-right.
-// Click opens the existing Ask AI side panel (Quill agent dispatch is
-// role-based; see spike result). Drag repositions freely with
-// per-workspace-member persistence in localStorage.
 export const CoachMascot = () => {
   const currentWorkspaceMember = useAtomStateValue(currentWorkspaceMemberState);
   const position = useAtomStateValue(coachMascotPositionState);
   const setPosition = useSetAtomState(coachMascotPositionState);
   const isSidePanelOpened = useAtomStateValue(isSidePanelOpenedState);
   const openChat = useCoachMascotOpenChat();
-  const reducedMotion = useReducedMotion();
   const [hydrated, setHydrated] = useState(false);
 
-  // Hydrate from localStorage on mount. Skip rendering until hydrated
-  // so the user doesn't see a position flash from (0,0) → persisted.
   useEffect(() => {
     setPosition(
       loadCoachMascotPosition(currentWorkspaceMember?.id) ??
@@ -121,22 +86,24 @@ export const CoachMascot = () => {
 
   if (!hydrated) return null;
 
-  const Button = isSidePanelOpened ? StyledMascotButtonOpen : StyledMascotButton;
-
   return (
-    <Button
-      offsetX={position.x}
-      offsetY={position.y}
+    <button
       onMouseDown={handleMouseDown}
       onClick={handleClick}
       aria-label="Open Quill"
       title="Quill"
       data-testid="coach-mascot"
       type="button"
-      animate={reducedMotion ? undefined : { scale: isDragging ? 1.05 : 1 }}
-      transition={{ duration: 0.15, ease: 'easeOut' }}
+      style={isSidePanelOpened ? buttonStyleOpen(position.x, position.y) : buttonStyle(position.x, position.y)}
     >
-      <CoachMascotIcon size={28} />
-    </Button>
+      <img
+        src="/coach-mascot/quill.svg"
+        alt="Quill"
+        width={ICON_SIZE}
+        height={ICON_SIZE}
+        draggable={false}
+        style={{ display: 'block', pointerEvents: 'none' }}
+      />
+    </button>
   );
 };
