@@ -1,4 +1,5 @@
 import { currentWorkspaceState } from '@/auth/states/currentWorkspaceState';
+import { CoachMascotNavigationButton } from '@/coach-mascot/components/CoachMascotNavigationButton';
 import { MainNavigationDrawerNavigationContent } from '@/navigation/components/MainNavigationDrawerNavigationContent';
 import { MainNavigationDrawerTabsRow } from '@/navigation/components/MainNavigationDrawerTabsRow';
 import { NavigationDrawerTabbedContent } from '@/navigation/components/NavigationDrawerTabbedContent';
@@ -38,6 +39,12 @@ export const MainNavigationDrawer = ({ className }: { className?: string }) => {
           navigationContent={<MainNavigationDrawerNavigationContent />}
         />
       </NavigationDrawerScrollableContent>
+
+      {hasAiPermission && (
+        <NavigationDrawerFixedContent>
+          <CoachMascotNavigationButton />
+        </NavigationDrawerFixedContent>
+      )}
     </NavigationDrawer>
   );
 };

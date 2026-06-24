@@ -1,1 +1,1 @@
-export { CoachMascot } from './CoachMascot';
+export { CoachMascotNavigationButton } from './components/CoachMascotNavigationButton';
