@@ -60,4 +60,18 @@ describe('aiGraphqlApiExceptionHandler', () => {
       AiExceptionCode.MESSAGE_NOT_FOUND,
     );
   });
+
+  it('maps ambiguous role-agent bindings to INTERNAL_SERVER_ERROR', () => {
+    const error = new AiException(
+      'Ambiguous agent role resolution',
+      AiExceptionCode.AGENT_ROLE_AMBIGUOUS,
+    );
+
+    const graphqlError = catchGraphqlError(error);
+
+    expect(graphqlError.extensions.code).toBe(ErrorCode.INTERNAL_SERVER_ERROR);
+    expect(graphqlError.extensions.subCode).toBe(
+      AiExceptionCode.AGENT_ROLE_AMBIGUOUS,
+    );
+  });
 });

@@ -29,6 +29,7 @@ export const aiGraphqlApiExceptionHandler = (error: Error) => {
       case AiExceptionCode.ROLE_CANNOT_BE_ASSIGNED_TO_AGENTS:
         throw new ForbiddenError(error);
       case AiExceptionCode.AGENT_EXECUTION_FAILED:
+      case AiExceptionCode.AGENT_ROLE_AMBIGUOUS:
       case AiExceptionCode.API_KEY_NOT_CONFIGURED:
       case AiExceptionCode.USER_WORKSPACE_ID_NOT_FOUND:
         throw new InternalServerError(error);

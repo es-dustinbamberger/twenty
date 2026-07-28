@@ -17,6 +17,7 @@ export enum AiExceptionCode {
   USER_WORKSPACE_ID_NOT_FOUND = 'USER_WORKSPACE_ID_NOT_FOUND',
   ROLE_NOT_FOUND = 'ROLE_NOT_FOUND',
   ROLE_CANNOT_BE_ASSIGNED_TO_AGENTS = 'ROLE_CANNOT_BE_ASSIGNED_TO_AGENTS',
+  AGENT_ROLE_AMBIGUOUS = 'AGENT_ROLE_AMBIGUOUS',
 }
 
 const getAiExceptionUserFriendlyMessage = (code: AiExceptionCode) => {
@@ -45,6 +46,8 @@ const getAiExceptionUserFriendlyMessage = (code: AiExceptionCode) => {
       return msg`Role not found.`;
     case AiExceptionCode.ROLE_CANNOT_BE_ASSIGNED_TO_AGENTS:
       return msg`This role cannot be assigned to agents.`;
+    case AiExceptionCode.AGENT_ROLE_AMBIGUOUS:
+      return msg`Ambiguous agent role — multiple agents bound to the same role.`;
     default:
       assertUnreachable(code);
   }
