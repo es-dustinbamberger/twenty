@@ -281,6 +281,7 @@ export class AgentChatService {
     threadId,
     text,
     id,
+    agentId,
     fileAttachments,
     workspaceId,
     userWorkspaceId,
@@ -288,6 +289,7 @@ export class AgentChatService {
     threadId: string;
     text: string;
     id?: string;
+    agentId?: string;
     fileAttachments?: AiChatFileAttachment[];
     workspaceId: string;
     userWorkspaceId: string;
@@ -297,7 +299,7 @@ export class AgentChatService {
       threadId,
       turnId: null,
       role: AgentMessageRole.USER,
-      agentId: null,
+      agentId: agentId ?? null,
       status: AgentMessageStatus.QUEUED,
     };
 
@@ -401,14 +403,16 @@ export class AgentChatService {
     messageId,
     threadId,
     workspaceId,
+    agentId,
   }: {
     messageId: string;
     threadId: string;
     workspaceId: string;
+    agentId?: string | null;
   }): Promise<string | null> {
     const turnInsertResult = await this.turnRepository.insert(workspaceId, {
       threadId,
-      agentId: null,
+      agentId: agentId ?? null,
     });
 
     const savedTurnId = turnInsertResult.identifiers[0].id as string;
@@ -418,6 +422,7 @@ export class AgentChatService {
       { id: messageId, threadId, status: AgentMessageStatus.QUEUED },
       {
         status: AgentMessageStatus.SENT,
+        agentId: agentId ?? null,
         processedAt: new Date(),
         turnId: savedTurnId,
       },

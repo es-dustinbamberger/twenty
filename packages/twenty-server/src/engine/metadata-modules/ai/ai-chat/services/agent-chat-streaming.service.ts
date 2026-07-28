@@ -202,6 +202,7 @@ export class AgentChatStreamingService {
       messageId: nextQueued.id,
       threadId,
       workspaceId,
+      agentId: nextQueued.agentId,
     });
 
     if (turnId === null) {
@@ -246,6 +247,7 @@ export class AgentChatStreamingService {
         messages: uiMessages,
         browsingContext: null,
         lastUserMessageText: messageText,
+        agentId: nextQueued.agentId ?? undefined,
         lastUserMessageParts,
         hasTitle,
         conversationSizeTokens: thread.conversationSize,

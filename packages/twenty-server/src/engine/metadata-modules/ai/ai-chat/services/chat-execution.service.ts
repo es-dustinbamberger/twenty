@@ -59,6 +59,7 @@ import {
   getCallLevelCacheProviderOptions,
   injectCacheBreakpoint,
 } from 'src/engine/metadata-modules/ai/ai-chat/utils/inject-cache-breakpoint.util';
+import { resolveChatAgentContext } from 'src/engine/metadata-modules/ai/ai-chat/utils/resolve-chat-agent-context.util';
 import { AI_TELEMETRY_CONFIG } from 'src/engine/metadata-modules/ai/ai-models/constants/ai-telemetry.const';
 import { AiModelRegistryService } from 'src/engine/metadata-modules/ai/ai-models/services/ai-model-registry.service';
 import { NativeToolBinderService } from 'src/engine/metadata-modules/ai/ai-models/services/native-tool-binder.service';
@@ -152,22 +153,28 @@ export class ChatExecutionService {
       { compactOutput: true },
     );
 
-    const resolvedModelId = modelId ?? workspace.smartModel;
-    let agentPrompt: string | undefined;
-    if (agentId) {
-      const agent = await this.agentService.findOneAgentById({
-        id: agentId,
-        workspaceId: workspace.id,
+    const roleAgents = agentId
+      ? []
+      : (await this.agentService.findManyAgents(workspace.id)).filter(
+          (candidate) => candidate.roleId === roleId,
+        );
+    const explicitAgent = agentId
+      ? await this.agentService.findOneAgentById({
+          id: agentId,
+          workspaceId: workspace.id,
+        })
+      : null;
+    const { resolvedModelId, combinedWorkspaceInstructions } =
+      resolveChatAgentContext({
+        agentId,
+        logger: this.logger,
+        roleId,
+        roleAgents,
+        explicitAgent,
+        modelId,
+        workspaceModelId: workspace.smartModel,
+        workspaceInstructions: workspace.aiAdditionalInstructions,
       });
-      if (agent.prompt) {
-        agentPrompt = agent.prompt;
-      }
-    }
-
-    const combinedWorkspaceInstructions = [agentPrompt, workspace.aiAdditionalInstructions]
-      .filter((s): s is string => Boolean(s))
-      .join('\n\n') || undefined;
-
 
     this.aiModelRegistryService.validateModelAvailability(
       resolvedModelId,

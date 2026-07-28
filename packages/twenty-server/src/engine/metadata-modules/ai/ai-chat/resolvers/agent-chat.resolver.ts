@@ -1,4 +1,4 @@
-import { UseGuards, UseInterceptors } from '@nestjs/common';
+import { Logger, UseGuards, UseInterceptors } from '@nestjs/common';
 import {
   Args,
   Float,
@@ -23,6 +23,8 @@ import { AuthWorkspace } from 'src/engine/decorators/auth/auth-workspace.decorat
 import { SettingsPermissionGuard } from 'src/engine/guards/settings-permission.guard';
 import { WorkspaceAuthGuard } from 'src/engine/guards/workspace-auth.guard';
 import { AgentMessageDTO } from 'src/engine/metadata-modules/ai/ai-agent-execution/dtos/agent-message.dto';
+import { AgentActorContextService } from 'src/engine/metadata-modules/ai/ai-agent-execution/services/agent-actor-context.service';
+import { AgentService } from 'src/engine/metadata-modules/ai/ai-agent/agent.service';
 import { type BrowsingContextType } from 'src/engine/metadata-modules/ai/ai-agent/types/browsingContext.type';
 import { AgentChatThreadDTO } from 'src/engine/metadata-modules/ai/ai-chat/dtos/agent-chat-thread.dto';
 import { FileAttachmentInput } from 'src/engine/metadata-modules/ai/ai-chat/dtos/file-attachment.input';
@@ -35,6 +37,7 @@ import { AgentChatStreamingService } from 'src/engine/metadata-modules/ai/ai-cha
 import { AgentChatService } from 'src/engine/metadata-modules/ai/ai-chat/services/agent-chat.service';
 import { SystemPromptBuilderService } from 'src/engine/metadata-modules/ai/ai-chat/services/system-prompt-builder.service';
 import { getCancelChannel } from 'src/engine/metadata-modules/ai/ai-chat/utils/get-cancel-channel.util';
+import { resolveChatAgentContext } from 'src/engine/metadata-modules/ai/ai-chat/utils/resolve-chat-agent-context.util';
 import { AiModelRegistryService } from 'src/engine/metadata-modules/ai/ai-models/services/ai-model-registry.service';
 import {
   AiException,
@@ -47,6 +50,8 @@ import { WorkspaceScopedRepository } from 'src/engine/twenty-orm/workspace-scope
 @UseInterceptors(AiGraphqlApiExceptionInterceptor)
 @MetadataResolver(() => AgentChatThreadDTO)
 export class AgentChatResolver {
+  private readonly logger = new Logger(AgentChatResolver.name);
+
   constructor(
     private readonly agentChatService: AgentChatService,
     private readonly agentChatStreamingService: AgentChatStreamingService,
@@ -57,6 +62,8 @@ export class AgentChatResolver {
     private readonly redisClientService: RedisClientService,
     @InjectWorkspaceScopedRepository(AgentChatThreadEntity)
     private readonly threadRepository: WorkspaceScopedRepository<AgentChatThreadEntity>,
+    private readonly agentActorContextService: AgentActorContextService,
+    private readonly agentService: AgentService,
   ) {}
 
   @Query(() => [AgentChatThreadDTO])
@@ -148,7 +155,34 @@ export class AgentChatResolver {
       );
     }
 
-    const resolvedModelId = modelId ?? workspace.smartModel;
+    const { roleId } =
+      await this.agentActorContextService.buildUserAndAgentActorContext(
+        userWorkspaceId,
+        workspace.id,
+      );
+
+    const roleAgents = agentId
+      ? []
+      : (await this.agentService.findManyAgents(workspace.id)).filter(
+          (candidate) => candidate.roleId === roleId,
+        );
+    const explicitAgent = agentId
+      ? await this.agentService.findOneAgentById({
+          id: agentId,
+          workspaceId: workspace.id,
+        })
+      : null;
+    const { agent, resolvedModelId } = resolveChatAgentContext({
+      agentId,
+      logger: this.logger,
+      roleId,
+      roleAgents,
+      explicitAgent,
+      modelId,
+      workspaceModelId: workspace.smartModel,
+      workspaceInstructions: workspace.aiAdditionalInstructions,
+    });
+    const resolvedAgentId = agent?.id;
 
     this.aiModelRegistryService.validateModelAvailability(
       resolvedModelId,
@@ -181,6 +215,7 @@ export class AgentChatResolver {
         threadId,
         text,
         id: messageId,
+        agentId: resolvedAgentId,
         fileAttachments: fileAttachments ?? undefined,
         workspaceId: workspace.id,
         userWorkspaceId,
@@ -198,8 +233,8 @@ export class AgentChatResolver {
     const result = await this.agentChatStreamingService.streamAgentChat({
       threadId,
       browsingContext: browsingContext ?? null,
-      modelId,
-      agentId,
+      modelId: resolvedModelId,
+      agentId: resolvedAgentId,
       userWorkspaceId,
       workspace,
       text,
