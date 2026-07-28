@@ -139,6 +139,7 @@ export class StreamAgentChatJob {
       ? Promise.resolve({ turnId: data.existingTurnId })
       : this.agentChatService.addMessage({
           threadId: data.threadId,
+          agentId: data.agentId,
           uiMessage: {
             role: AgentMessageRole.USER,
             parts: data.lastUserMessageParts.filter(
@@ -287,6 +288,7 @@ export class StreamAgentChatJob {
                     threadId: data.threadId,
                     workspaceId: data.workspaceId,
                     userWorkspaceId: data.userWorkspaceId,
+                    agentId: data.agentId,
                     streamUsage,
                     lastStepConversationSize,
                     totalCacheCreationTokens,
@@ -442,6 +444,7 @@ export class StreamAgentChatJob {
     threadId,
     workspaceId,
     userWorkspaceId,
+    agentId,
     streamUsage,
     lastStepConversationSize,
     totalCacheCreationTokens,
@@ -455,6 +458,7 @@ export class StreamAgentChatJob {
     threadId: string;
     workspaceId: string;
     userWorkspaceId: string;
+    agentId?: string;
     streamUsage: {
       inputTokens: number;
       outputTokens: number;
@@ -501,6 +505,7 @@ export class StreamAgentChatJob {
 
     await this.agentChatService.addMessage({
       threadId,
+      agentId,
       uiMessage: responseMessage,
       turnId: userMessage.turnId ?? undefined,
       workspaceId,
