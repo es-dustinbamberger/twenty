@@ -91,11 +91,12 @@ export class LocalChildProcessRunnerService {
               if (!msg || msg.type !== 'run') return;
               try {
                 const out = await mod.${handlerName}(msg.payload);
-                process.send && process.send({ ok: true, result: out });
-                process.exit(0);
+                process.send({ ok: true, result: out }, () => process.exit(0));
               } catch (err) {
-                process.send && process.send({ ok: false, error: String(err), stack: err?.stack });
-                process.exit(1);
+                process.send(
+                  { ok: false, error: String(err), stack: err?.stack },
+                  () => process.exit(1),
+                );
               }
             });
           } else {
@@ -109,11 +110,13 @@ export class LocalChildProcessRunnerService {
         } catch (err) {
           const msg = String(err);
           if (process.send) {
-            process.send({ ok: false, error: msg, stack: err?.stack });
+            process.send({ ok: false, error: msg, stack: err?.stack }, () =>
+              process.exit(1),
+            );
           } else {
             process.stdout.write(msg);
+            process.exit(1);
           }
-          process.exit(1);
         }
       })();
     `;
